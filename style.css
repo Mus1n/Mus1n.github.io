@@ -1,0 +1,147 @@
+#footer {
+	background-color: #000;
+	border-top-color: #000;
+        cursor:crosshair;
+}
+
+
+.containerA {
+	padding-left:15px;
+	padding-right: 15px;
+        cursor:crosshair;
+}
+
+div.normalbox div.table h4 a, div.normalbox div.table span.heading a {
+	color: #fff;
+        cursor:crosshair;
+}
+
+
+div.normalbox div.body {
+	background-color: #2D2D2D;
+        cursor:crosshair;
+}
+
+
+a {
+	color: #ff6767;
+        cursor:crosshair;
+}
+
+a:hover {
+	color: #fff;
+        cursor:crosshair;
+}
+
+
+div.normalbox div.table div.row:nth-of-type(2n-1) {
+	background-color: #151515;
+        cursor:crosshair;
+}
+
+
+body {
+	color: #fff;
+        cursor:crosshair;
+}
+
+
+.previewform {
+	background: #2D2D2D;
+        cursor:crosshair;
+}
+
+
+div.normalbox div.tablerelated a.heading {
+	border-bottom-color: #888;
+	color: #fff;
+        cursor:crosshair;
+}
+
+input{
+
+        cursor:crosshair;
+}
+
+textarea{
+        background-color: #181818;
+        color: #666666;
+        cursor:crosshair;
+}
+
+
+html{
+        cursor:crosshair;
+}
+
+.menu{
+	text-align:right;
+}
+
+footer{
+	color:#BBBBBB;
+	font-size:14px;
+	text-align:center;
+	
+}
+
+.headerbox .headercorner{
+	background-image: url(https://media.moddb.com/images/mods/1/58/57741/banner.png);
+}
+
+.mediaprevious, .medianext{
+	border-radius: 50%;
+	cursor:crosshair;
+}
+
+.mediahd{
+margin:-120px 0px 0px 0px;
+cursor:crosshair;
+border-radius: 15%;
+}
+
+
+
+.mbr-embedded-video {
+pointer-events: inherit;
+}
+
+#profiledescription{
+	margin:10px;
+	
+}
+
+.rescaled{
+	width:120px;
+	height:90px;
+}
+
+img{
+ width:100%;
+ height:100%;
+}
+
+#tg{
+	width:18px;
+	height:18px;
+	
+}
+
+
+#Flag{
+	width:300px;
+	height:600px;
+	
+}
+
+
+#Logo{
+	width:300px;
+	height:300px;
+	
+}
+
+#MayAlsoLike{
+	width:60px;
+	height:45px;
+}
