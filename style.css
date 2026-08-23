@@ -1451,4 +1451,665 @@ footer > span:last-child {
     gap: 10px;
   }
 }
-```
+
+
+
+/* =========================================================
+   FINAL RESPONSIVE / MOBILE OVERRIDES
+   ========================================================= */
+
+/* Keep the page content in a predictable stacking context */
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* Prevent the negative-z-index backgrounds from affecting
+   the normal document flow / footer stacking */
+main {
+  position: relative;
+  z-index: 0;
+}
+
+footer {
+  position: relative;
+  z-index: 1;
+  clear: both;
+}
+
+/* =========================================================
+   DESKTOP FOOTER
+   ========================================================= */
+
+@media (min-width: 801px) {
+  footer {
+    margin-top: 10px;
+    padding-top: 42px;
+    padding-bottom: 50px;
+  }
+
+  .article-section {
+    padding-bottom: 90px;
+  }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+  .topbar {
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+
+  nav {
+    gap: 17px;
+  }
+
+  .section {
+    width: min(var(--max), 92%);
+    padding-top: 90px;
+    padding-bottom: 90px;
+  }
+
+  .section-heading {
+    grid-template-columns: 1fr 280px;
+    gap: 30px;
+  }
+
+  .hero-content {
+    width: 92%;
+  }
+
+  .article-grid {
+    gap: 35px;
+  }
+
+  .feature-list li {
+    grid-template-columns: 125px 1fr;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+  /* -------------------------------------------------------
+     HEADER
+     ------------------------------------------------------- */
+
+  .topbar {
+    height: 62px;
+    padding: 0 18px;
+
+    background:
+      linear-gradient(
+        to bottom,
+        rgba(5, 8, 12, .96),
+        rgba(5, 8, 12, .72)
+      );
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .brand {
+    font-size: 15px;
+    letter-spacing: .13em;
+  }
+
+  nav {
+    gap: 10px;
+    font-size: 9px;
+    letter-spacing: .08em;
+  }
+
+  nav a:not(.nav-button) {
+    display: none;
+  }
+
+  .nav-button {
+    padding: 8px 11px;
+    border-radius: 7px;
+  }
+
+  /* -------------------------------------------------------
+     HERO
+     ------------------------------------------------------- */
+
+  .hero {
+    min-height: 100svh;
+    min-height: 100dvh;
+  }
+
+  .hero-bg {
+    background-position: 62% center;
+  }
+
+  .hero-content {
+    width: auto;
+    margin: 0;
+    padding:
+      80px
+      22px
+      80px;
+  }
+
+  .eyebrow {
+    font-size: 9px;
+    letter-spacing: .17em;
+  }
+
+  .hero h1 {
+    margin-top: 10px;
+    margin-bottom: 18px;
+
+    font-size: clamp(54px, 17vw, 88px);
+    line-height: .88;
+  }
+
+  .hero-lead {
+    max-width: 100%;
+
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+
+    width: 100%;
+    max-width: 330px;
+
+    margin-top: 25px;
+  }
+
+  .button {
+    min-height: 46px;
+    padding-left: 16px;
+    padding-right: 16px;
+
+    font-size: 9px;
+    letter-spacing: .11em;
+  }
+
+  .hero-meta {
+    flex-wrap: wrap;
+    gap: 7px 9px;
+
+    max-width: 330px;
+
+    margin-top: 28px;
+
+    font-size: 7px;
+    line-height: 1.4;
+  }
+
+  .scroll-cue {
+    right: 18px;
+    bottom: 20px;
+  }
+
+  /* -------------------------------------------------------
+     SECTIONS
+     ------------------------------------------------------- */
+
+  .section {
+    width: auto;
+    margin-left: 18px;
+    margin-right: 18px;
+
+    padding-top: 72px;
+    padding-bottom: 72px;
+  }
+
+  .section-heading {
+    display: block;
+    margin-bottom: 28px;
+  }
+
+  .section-heading h2 {
+    margin-top: 7px;
+    font-size: clamp(32px, 10vw, 48px);
+  }
+
+  .section-heading > p {
+    margin-top: 16px;
+
+    font-size: 12px;
+    line-height: 1.65;
+  }
+
+  /* -------------------------------------------------------
+     SCREENSHOT SLIDER
+     ------------------------------------------------------- */
+
+  .screenshot-slider {
+    width: 100%;
+  }
+
+  .slider-main {
+    border-radius: 11px;
+  }
+
+  .slider-image-button {
+    width: 100%;
+  }
+
+  .slider-image-button img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+  }
+
+  .slider-arrow {
+    width: 34px;
+    height: 54px;
+
+    font-size: 29px;
+
+    border-radius: 8px;
+  }
+
+  .slider-arrow.prev {
+    left: 7px;
+  }
+
+  .slider-arrow.next {
+    right: 7px;
+  }
+
+  .slider-counter {
+    right: 9px;
+    bottom: 9px;
+
+    padding: 5px 7px;
+
+    font-size: 8px;
+  }
+
+  /* EXACTLY 3 thumbnails */
+  .slider-thumbs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+
+    margin-top: 8px;
+
+    width: 100%;
+  }
+
+  .thumb {
+    min-width: 0;
+    border-radius: 7px;
+
+    /* Prevent accidental browser drag */
+    user-select: none;
+    -webkit-user-drag: none;
+
+    /* Makes the queue clearly scrollable */
+    touch-action: pan-y;
+  }
+
+  .thumb img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  /* -------------------------------------------------------
+     VIDEO
+     ------------------------------------------------------- */
+
+  .video-wrap {
+    margin-top: 38px;
+  }
+
+  .video-heading {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+
+    font-size: 8px;
+  }
+
+  .video {
+    border-radius: 10px;
+  }
+
+  /* -------------------------------------------------------
+     ARTICLE
+     ------------------------------------------------------- */
+
+  .article-section {
+    padding-top: 35px;
+    padding-bottom: 65px;
+  }
+
+  .article {
+    padding: 25px 20px;
+    border-radius: 13px;
+  }
+
+  .article-intro {
+    grid-template-columns: 1fr;
+    gap: 7px;
+
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .article-intro p:last-child {
+    grid-column: auto;
+  }
+
+  .article-mark {
+    margin-bottom: 2px;
+  }
+
+  .article-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+
+    margin-top: 38px;
+  }
+
+  .article h3 {
+    margin-bottom: 15px;
+  }
+
+  .feature-list li {
+    grid-template-columns: 105px 1fr;
+    gap: 10px;
+
+    padding: 13px 9px;
+
+    font-size: 11px;
+  }
+
+  .feature-list b {
+    font-size: 8px;
+  }
+
+  .feature-list span {
+    line-height: 1.55;
+  }
+
+  .quote {
+    padding: 21px;
+  }
+
+  .quote p {
+    font-size: 13px;
+  }
+
+  .pipeline {
+    gap: 5px;
+    line-height: 1.3;
+  }
+
+  .pipeline b {
+    padding: 5px 6px;
+  }
+
+  .article-copy {
+    margin-top: 38px;
+    padding-top: 27px;
+  }
+
+  .article-copy > p {
+    font-size: 13px;
+  }
+
+  .audience {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .audience div {
+    padding: 18px;
+  }
+
+  .cta {
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 22px;
+    margin-top: 42px;
+    padding-top: 30px;
+  }
+
+  .cta h2 {
+    font-size: clamp(31px, 9vw, 45px);
+  }
+
+  .cta .button {
+    width: 100%;
+  }
+
+  .links {
+    grid-template-columns: 1fr;
+    margin-top: 32px;
+  }
+
+  .links a {
+    padding: 15px 10px;
+    font-size: 10px;
+  }
+
+  .links a + a {
+    border-left: 0;
+    border-top: 1px solid rgba(157,195,220,.11);
+  }
+
+  .note {
+    font-size: 9px;
+    line-height: 1.6;
+  }
+
+  /* -------------------------------------------------------
+     FOOTER
+     ------------------------------------------------------- */
+
+  footer {
+    width: auto;
+    margin-left: 18px;
+    margin-right: 18px;
+
+    padding-top: 27px;
+    padding-bottom: 32px;
+
+    gap: 8px;
+
+    font-size: 8px;
+  }
+
+  footer > span:first-child {
+    font-size: 10px;
+  }
+
+  footer > span:last-child {
+    font-size: 8px;
+  }
+}
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+  .topbar {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .brand {
+    font-size: 14px;
+  }
+
+  .nav-button {
+    padding: 7px 9px;
+    font-size: 8px;
+  }
+
+  .hero-content {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .hero h1 {
+    font-size: clamp(50px, 17vw, 76px);
+  }
+
+  .hero-lead {
+    font-size: 13px;
+  }
+
+  .hero-meta {
+    font-size: 6.5px;
+  }
+
+  .section {
+    margin-left: 14px;
+    margin-right: 14px;
+
+    padding-top: 60px;
+    padding-bottom: 60px;
+  }
+
+  .section-heading {
+    margin-bottom: 22px;
+  }
+
+  .section-heading h2 {
+    font-size: clamp(30px, 10vw, 43px);
+  }
+
+  .slider-arrow {
+    width: 30px;
+    height: 48px;
+    font-size: 26px;
+  }
+
+  .slider-arrow.prev {
+    left: 5px;
+  }
+
+  .slider-arrow.next {
+    right: 5px;
+  }
+
+  .slider-thumbs {
+    gap: 5px;
+    margin-top: 6px;
+  }
+
+  .article {
+    padding: 22px 16px;
+  }
+
+  .article-intro {
+    font-size: 14px;
+  }
+
+  .feature-list li {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+
+  .quote {
+    padding: 19px;
+  }
+
+  .pipeline {
+    font-size: 6px;
+  }
+
+  .audience div {
+    padding: 16px;
+  }
+
+  footer {
+    margin-left: 14px;
+    margin-right: 14px;
+
+    align-items: flex-start;
+  }
+}
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 360px) {
+
+  .hero h1 {
+    font-size: 48px;
+  }
+
+  .hero-actions {
+    max-width: 100%;
+  }
+
+  .hero-meta {
+    display: none;
+  }
+
+  .section-heading h2 {
+    font-size: 29px;
+  }
+
+  .slider-arrow {
+    width: 27px;
+    height: 43px;
+    font-size: 23px;
+  }
+
+  .slider-counter {
+    display: none;
+  }
+}
+
+/* =========================================================
+   TOUCH / SCROLL UX
+   ========================================================= */
+
+.slider-thumbs,
+.slider-main {
+  overscroll-behavior: contain;
+}
+
+.slider-thumbs {
+  cursor: ns-resize;
+}
+
+@media (hover: none) {
+  .thumb:hover {
+    opacity: .56;
+  }
+
+  .thumb.active {
+    opacity: 1;
+  }
+}
+
+@media (min-width: 801px) {
+  footer {
+    width: min(var(--max), 90%);
+    margin-left: auto;
+    margin-right: auto;
+
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
