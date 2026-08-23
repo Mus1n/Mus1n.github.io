@@ -2113,3 +2113,17 @@ footer {
     padding-right: 0;
   }
 }
+
+/* Smooth screenshot transition */
+.slider-image-button img {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity .18s ease,
+    transform .22s ease;
+}
+
+.slider-image-button img.is-changing {
+  opacity: 0;
+  transform: scale(.985);
+}
