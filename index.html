@@ -238,9 +238,13 @@
   </div>
 
 
-
 <script>
 (() => {
+
+  /* =========================================================
+     ELEMENTS
+     ========================================================= */
+
   const slider = document.querySelector('.screenshot-slider');
   const thumbContainer = document.querySelector('.slider-thumbs');
 
@@ -253,13 +257,26 @@
   const lightboxCurrent = document.getElementById('lightboxCurrent');
   const lightboxTotal = document.getElementById('lightboxTotal');
 
-  const prevButton = document.querySelector('.slider-arrow.prev');
-  const nextButton = document.querySelector('.slider-arrow.next');
+  const mainImageButton =
+    document.querySelector('.slider-image-button');
 
-  const thumbs = [...document.querySelectorAll('.thumb')];
+  const prevButton =
+    document.querySelector('.slider-arrow.prev');
+
+  const nextButton =
+    document.querySelector('.slider-arrow.next');
+
+  const thumbs =
+    [...document.querySelectorAll('.thumb')];
+
+
+  /* =========================================================
+     IMAGE DATA
+     ========================================================= */
 
   const images = thumbs
     .map((thumb) => {
+
       const img = thumb.querySelector('img');
 
       return img
@@ -268,36 +285,24 @@
             alt: img.alt || ''
           }
         : null;
+
     })
     .filter(Boolean);
 
+
   /* =========================================================
-     STATE
+     SETTINGS
      ========================================================= */
+
+  const VISIBLE_THUMBS = 3;
 
   let index = 0;
 
-  /*
-   * Position of the thumbnail queue.
-   *
-   * IMPORTANT:
-   * This is separate from "index".
-   *
-   * index      = currently selected/main image
-   * queueStart = first thumbnail currently visible
-   */
   let queueStart = 0;
 
-  /*
-   * Number of thumbnails visible below the main image.
-   */
-  const VISIBLE_THUMBS = 3;
-
-  /*
-   * Prevent multiple wheel events from one gesture
-   * from scrolling too many thumbnails/images.
-   */
   let wheelLocked = false;
+
+  let mainImageWasSwiped = false;
 
 
   /* =========================================================
@@ -310,15 +315,15 @@
   lightboxTotal.textContent =
     String(images.length).padStart(2, '0');
 
+
   thumbs.forEach((thumb, i) => {
 
-    /*
-     * Ignore incorrect data-index values from HTML.
-     * JS generates the correct indexes automatically.
-     */
     thumb.dataset.index = i;
 
-    thumb.setAttribute('role', 'tab');
+    thumb.setAttribute(
+      'role',
+      'tab'
+    );
 
     thumb.setAttribute(
       'aria-label',
@@ -330,36 +335,18 @@
     if (img) {
       img.alt = `Screenshot ${i + 1}`;
     }
+
   });
 
 
   /* =========================================================
      THUMBNAIL QUEUE
-     =========================================================
-     
-     Shows exactly 3 thumbnails whenever possible.
-
-     queueStart = 0
-
-     [01] [02] [03]
-     
-     queueStart = 1
-
-          [02] [03] [04]
-
-     queueStart = 2
-
-               [03] [04] [05]
-  */
+     ========================================================= */
 
   const updateThumbQueue = () => {
 
     const total = thumbs.length;
 
-    /*
-     * If there are 3 or fewer screenshots,
-     * show everything.
-     */
     if (total <= VISIBLE_THUMBS) {
 
       thumbs.forEach((thumb) => {
@@ -371,16 +358,41 @@
       return;
     }
 
+
     /*
-     * Keep queueStart inside valid range.
+     * Keep the selected image visible
+     * when selecting thumbnails / arrows.
      */
-    queueStart = Math.max(
-      0,
-      Math.min(
-        queueStart,
-        total - VISIBLE_THUMBS
-      )
-    );
+
+    if (index < queueStart) {
+      queueStart = index;
+    }
+
+    if (
+      index >=
+      queueStart + VISIBLE_THUMBS
+    ) {
+      queueStart =
+        index - VISIBLE_THUMBS + 1;
+    }
+
+
+    /*
+     * Keep queue inside valid range.
+     */
+
+    const maxStart =
+      total - VISIBLE_THUMBS;
+
+    queueStart =
+      Math.max(
+        0,
+        Math.min(
+          queueStart,
+          maxStart
+        )
+      );
+
 
     thumbs.forEach((thumb, i) => {
 
@@ -390,90 +402,9 @@
 
       thumb.style.display =
         visible ? '' : 'none';
+
     });
-  };
 
-
-  /* =========================================================
-     SCROLL THUMBNAIL QUEUE
-     =========================================================
-     
-     This ONLY moves the thumbnail queue.
-
-     It does NOT change "index".
-     
-     ↓ = next group
-     ↑ = previous group
-  */
-
-  const scrollThumbQueue = (delta) => {
-
-    const total = thumbs.length;
-
-    if (total <= VISIBLE_THUMBS) {
-      return;
-    }
-
-    queueStart += delta;
-
-    queueStart = Math.max(
-      0,
-      Math.min(
-        queueStart,
-        total - VISIBLE_THUMBS
-      )
-    );
-
-    updateThumbQueue();
-  };
-
-
-  /* =========================================================
-     KEEP SELECTED THUMBNAIL VISIBLE
-     =========================================================
-     
-     Called when user clicks a thumbnail or changes image
-     using arrows/keyboard.
-  */
-
-  const ensureSelectedThumbVisible = () => {
-
-    const total = thumbs.length;
-
-    if (total <= VISIBLE_THUMBS) {
-      queueStart = 0;
-      return;
-    }
-
-    /*
-     * Selected image is before the visible queue.
-     */
-    if (index < queueStart) {
-
-      queueStart = index;
-
-      return;
-    }
-
-    /*
-     * Selected image is after the visible queue.
-     */
-    if (index >= queueStart + VISIBLE_THUMBS) {
-
-      queueStart =
-        index - VISIBLE_THUMBS + 1;
-    }
-
-    /*
-     * Safety clamp.
-     */
-    queueStart = Math.max(
-      0,
-      Math.min(
-        queueStart,
-        total - VISIBLE_THUMBS
-      )
-    );
   };
 
 
@@ -481,33 +412,57 @@
      RENDER
      ========================================================= */
 
-const render = () => {
-  if (!images.length) return;
+  const render = () => {
 
-  const image = images[index];
+    if (!images.length) {
+      return;
+    }
 
-  /*
-   * ---------------------------------------------------------
-   * MAIN IMAGE — SMOOTH FADE
-   * ---------------------------------------------------------
-   */
 
-  sliderImage.classList.add('is-changing');
+    const image =
+      images[index];
 
-  setTimeout(() => {
-    sliderImage.src = image.src;
-    sliderImage.alt = image.alt;
 
-    /*
-     * Wait one frame before fading back in.
-     * This makes the transition noticeably smoother.
-     */
-    requestAnimationFrame(() => {
+    /* -------------------------------------------------------
+       MAIN IMAGE — SMOOTH FADE
+       ------------------------------------------------------- */
+
+    sliderImage.classList.add(
+      'is-changing'
+    );
+
+
+    const preload =
+      new Image();
+
+
+    preload.onload = () => {
+
+      sliderImage.src =
+        image.src;
+
+      sliderImage.alt =
+        image.alt;
+
+
       requestAnimationFrame(() => {
-        sliderImage.classList.remove('is-changing');
+
+        sliderImage.classList.remove(
+          'is-changing'
+        );
+
       });
-    });
-  }, 100);
+
+    };
+
+
+    preload.src =
+      image.src;
+
+
+    /* -------------------------------------------------------
+       COUNTER
+       ------------------------------------------------------- */
 
     sliderCurrent.textContent =
       String(index + 1).padStart(2, '0');
@@ -517,12 +472,15 @@ const render = () => {
 
 
     /* -------------------------------------------------------
-       LIGHTBOX
+       LIGHTBOX IMAGE
        ------------------------------------------------------- */
 
-    lightboxImage.src = image.src;
+    lightboxImage.src =
+      image.src;
 
-    lightboxImage.alt = image.alt;
+    lightboxImage.alt =
+      image.alt;
+
 
     lightboxCurrent.textContent =
       String(index + 1).padStart(2, '0');
@@ -549,22 +507,17 @@ const render = () => {
         'aria-selected',
         active ? 'true' : 'false'
       );
+
     });
 
 
-    /*
-     * When main image changes through arrows,
-     * keyboard or lightbox, make sure its thumbnail
-     * remains visible.
-     */
-    ensureSelectedThumbVisible();
-
     updateThumbQueue();
+
   };
 
 
   /* =========================================================
-     CHANGE MAIN IMAGE
+     CHANGE IMAGE
      ========================================================= */
 
   const change = (delta) => {
@@ -573,11 +526,68 @@ const render = () => {
       return;
     }
 
+
     index =
-      (index + delta + images.length) %
+      (
+        index +
+        delta +
+        images.length
+      ) %
       images.length;
 
+
     render();
+
+  };
+
+
+  /* =========================================================
+     MOVE THUMBNAIL QUEUE ONLY
+     ========================================================= */
+
+  const moveThumbQueue = (delta) => {
+
+    const total =
+      thumbs.length;
+
+
+    if (total <= VISIBLE_THUMBS) {
+      return;
+    }
+
+
+    queueStart += delta;
+
+
+    const maxStart =
+      total - VISIBLE_THUMBS;
+
+
+    /*
+     * Loop queue around.
+     */
+
+    if (queueStart < 0) {
+      queueStart = maxStart;
+    }
+
+
+    if (queueStart > maxStart) {
+      queueStart = 0;
+    }
+
+
+    thumbs.forEach((thumb, i) => {
+
+      const visible =
+        i >= queueStart &&
+        i < queueStart + VISIBLE_THUMBS;
+
+      thumb.style.display =
+        visible ? '' : 'none';
+
+    });
+
   };
 
 
@@ -589,48 +599,45 @@ const render = () => {
 
     render();
 
-    lightbox.hidden = false;
+
+    lightbox.hidden =
+      false;
+
 
     lightbox.setAttribute(
       'aria-hidden',
       'false'
     );
 
+
     document.body.classList.add(
       'lightbox-open'
     );
+
   };
 
 
   const closeLightbox = () => {
 
-    lightbox.hidden = true;
+    lightbox.hidden =
+      true;
+
 
     lightbox.setAttribute(
       'aria-hidden',
       'true'
     );
 
+
     document.body.classList.remove(
       'lightbox-open'
     );
+
   };
 
 
   /* =========================================================
-     MAIN IMAGE
-     ========================================================= */
-
-  document
-    .querySelector('.slider-image-button')
-    .addEventListener(
-      'click',
-      openLightbox
-    );
-
-
-  /* =========================================================
-     MAIN SLIDER ARROWS
+     BUTTONS
      ========================================================= */
 
   prevButton.addEventListener(
@@ -638,15 +645,12 @@ const render = () => {
     () => change(-1)
   );
 
+
   nextButton.addEventListener(
     'click',
     () => change(1)
   );
 
-
-  /* =========================================================
-     LIGHTBOX BUTTONS
-     ========================================================= */
 
   document
     .querySelector('.lightbox-close')
@@ -673,11 +677,35 @@ const render = () => {
 
 
   /* =========================================================
-     THUMBNAILS
-     =========================================================
-     
-     Clicking a thumbnail DOES change the main image.
-  */
+     MAIN IMAGE CLICK
+     ========================================================= */
+
+  mainImageButton.addEventListener(
+    'click',
+    () => {
+
+      /*
+       * Don't open fullscreen after swipe.
+       */
+
+      if (mainImageWasSwiped) {
+
+        mainImageWasSwiped =
+          false;
+
+        return;
+      }
+
+
+      openLightbox();
+
+    }
+  );
+
+
+  /* =========================================================
+     THUMBNAIL CLICK
+     ========================================================= */
 
   thumbs.forEach((thumb) => {
 
@@ -686,31 +714,32 @@ const render = () => {
       () => {
 
         index =
-          Number(thumb.dataset.index);
-
-        /*
-         * Move queue so the clicked thumbnail
-         * remains visible.
-         */
-        ensureSelectedThumbVisible();
+          Number(
+            thumb.dataset.index
+          );
 
         render();
+
       }
     );
+
   });
 
 
   /* =========================================================
-     CLOSE LIGHTBOX BY CLICKING BACKGROUND
+     LIGHTBOX BACKGROUND CLICK
      ========================================================= */
 
   lightbox.addEventListener(
     'click',
     (event) => {
 
-      if (event.target === lightbox) {
+      if (
+        event.target === lightbox
+      ) {
         closeLightbox();
       }
+
     }
   );
 
@@ -724,115 +753,89 @@ const render = () => {
     (event) => {
 
       /*
-       * ESC closes fullscreen.
+       * ESC
        */
+
       if (
         event.key === 'Escape' &&
         !lightbox.hidden
       ) {
+
         closeLightbox();
+
         return;
       }
 
 
       /*
-       * Left / right changes main image.
+       * Left / right
        */
-      if (event.key === 'ArrowLeft') {
+
+      if (
+        event.key === 'ArrowLeft'
+      ) {
         change(-1);
       }
 
-      if (event.key === 'ArrowRight') {
+
+      if (
+        event.key === 'ArrowRight'
+      ) {
         change(1);
       }
+
     }
   );
 
 
   /* =========================================================
      MOUSE WHEEL
-     =========================================================
-     
-     IMPORTANT:
+     ========================================================= */
 
-     Thumbnail queue:
-       ↓ = scroll queue only
-       ↑ = scroll queue only
+ const handleWheel = (event) => {
 
-     Lightbox:
-       ↓ = change fullscreen image
-       ↑ = change fullscreen image
-
-     Main image:
-       wheel does NOTHING.
-  */
-
-
-  /*
-   * Get the strongest wheel direction.
-   *
-   * This also works reasonably well with horizontal
-   * trackpad gestures.
-   */
-  const getWheelDelta = (event) => {
-
-    return Math.abs(event.deltaY) >=
-           Math.abs(event.deltaX)
+  const delta =
+    Math.abs(event.deltaY) >= Math.abs(event.deltaX)
       ? event.deltaY
       : event.deltaX;
-  };
 
+  if (Math.abs(delta) < 10) {
+    return;
+  }
+
+  event.preventDefault();
+
+  if (wheelLocked) {
+    return;
+  }
+
+  wheelLocked = true;
+
+  change(delta > 0 ? 1 : -1);
 
   /*
-   * ---------------------------------------------------------
-   * THUMBNAIL QUEUE WHEEL
-   * ---------------------------------------------------------
+   * Faster scrolling on mobile.
    */
+  const isMobile = window.matchMedia('(max-width: 800px)').matches;
+
+  setTimeout(() => {
+    wheelLocked = false;
+  }, isMobile ? 45 : 100);
+};
+
+  /* ---------------------------------------------------------
+     Wheel over thumbnail queue
+     --------------------------------------------------------- */
 
   thumbContainer.addEventListener(
     'wheel',
     (event) => {
 
-      const delta =
-        getWheelDelta(event);
-
-      /*
-       * Ignore tiny trackpad movements.
-       */
-      if (Math.abs(delta) < 10) {
-        return;
-      }
-
-      /*
-       * Prevent normal page scrolling while
-       * the pointer is over the thumbnail queue.
-       */
-      event.preventDefault();
-
-      /*
-       * Prevent one wheel gesture from jumping
-       * through several groups.
-       */
-      if (wheelLocked) {
-        return;
-      }
-
-      wheelLocked = true;
-
-
-      /*
-       * ONLY move thumbnail queue.
-       *
-       * The main "index" is NOT changed.
-       */
-      scrollThumbQueue(
-        delta > 0 ? 1 : -1
+      handleWheel(
+        event,
+        'queue'
       );
 
-
-      setTimeout(() => {
-        wheelLocked = false;
-      }, 100);
     },
     {
       passive: false
@@ -840,13 +843,9 @@ const render = () => {
   );
 
 
-  /*
-   * ---------------------------------------------------------
-   * LIGHTBOX WHEEL
-   * ---------------------------------------------------------
-   *
-   * Here wheel DOES change the selected image.
-   */
+  /* ---------------------------------------------------------
+     Wheel inside lightbox
+     --------------------------------------------------------- */
 
   lightbox.addEventListener(
     'wheel',
@@ -856,42 +855,547 @@ const render = () => {
         return;
       }
 
-      const delta =
-        getWheelDelta(event);
 
-      if (Math.abs(delta) < 10) {
-        return;
-      }
-
-      /*
-       * Stop page scrolling.
-       */
-      event.preventDefault();
-
-      /*
-       * Prevent multiple changes from one gesture.
-       */
-      if (wheelLocked) {
-        return;
-      }
-
-      wheelLocked = true;
-
-
-      /*
-       * Change fullscreen image.
-       */
-      change(
-        delta > 0 ? 1 : -1
+      handleWheel(
+        event,
+        'lightbox'
       );
 
-
-      setTimeout(() => {
-        wheelLocked = false;
-      }, 100);
     },
     {
       passive: false
+    }
+  );
+
+
+  /* =========================================================
+     TOUCH / SWIPE
+     ========================================================= */
+
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  let touchCurrentX = 0;
+  let touchCurrentY = 0;
+
+  let touchMoved = false;
+
+
+  /* ---------------------------------------------------------
+     Generic touch start
+     --------------------------------------------------------- */
+
+  const touchStart = (
+    event
+  ) => {
+
+    if (
+      !event.touches.length
+    ) {
+      return;
+    }
+
+
+    const touch =
+      event.touches[0];
+
+
+    touchStartX =
+      touch.clientX;
+
+    touchStartY =
+      touch.clientY;
+
+
+    touchCurrentX =
+      touch.clientX;
+
+    touchCurrentY =
+      touch.clientY;
+
+
+    touchMoved =
+      false;
+
+  };
+
+
+  /* ---------------------------------------------------------
+     Generic touch move
+     --------------------------------------------------------- */
+
+  const touchMove = (
+    event
+  ) => {
+
+    if (
+      !event.touches.length
+    ) {
+      return;
+    }
+
+
+    const touch =
+      event.touches[0];
+
+
+    touchCurrentX =
+      touch.clientX;
+
+    touchCurrentY =
+      touch.clientY;
+
+
+    const dx =
+      touchCurrentX -
+      touchStartX;
+
+
+    const dy =
+      touchCurrentY -
+      touchStartY;
+
+
+    if (
+      Math.abs(dx) > 10 ||
+      Math.abs(dy) > 10
+    ) {
+
+      touchMoved =
+        true;
+
+    }
+
+
+    return {
+      dx,
+      dy
+    };
+
+  };
+
+
+  /* =========================================================
+     THUMBNAIL QUEUE SWIPE
+     =========================================================
+     
+     ← = previous queue
+     → = next queue
+
+     Does NOT change main image.
+     ========================================================= */
+
+  thumbContainer.addEventListener(
+    'touchstart',
+    touchStart,
+    {
+      passive: true
+    }
+  );
+
+
+  thumbContainer.addEventListener(
+    'touchmove',
+    touchMove,
+    {
+      passive: true
+    }
+  );
+
+
+  thumbContainer.addEventListener(
+    'touchend',
+    () => {
+
+      if (!touchMoved) {
+        return;
+      }
+
+
+      const dx =
+        touchCurrentX -
+        touchStartX;
+
+
+      const dy =
+        touchCurrentY -
+        touchStartY;
+
+
+      /*
+       * Ignore vertical swipe.
+       */
+
+      if (
+        Math.abs(dx) <=
+        Math.abs(dy)
+      ) {
+        return;
+      }
+
+
+      /*
+       * Ignore tiny swipe.
+       */
+
+      if (
+        Math.abs(dx) < 40
+      ) {
+        return;
+      }
+
+
+      moveThumbQueue(
+        dx < 0 ? 1 : -1
+      );
+
+    },
+    {
+      passive: true
+    }
+  );
+
+
+  /* =========================================================
+     MAIN IMAGE SWIPE
+     =========================================================
+
+     ← = next image
+     → = previous image
+
+     Tap = fullscreen
+     ========================================================= */
+
+  let mainTouchStartX = 0;
+  let mainTouchStartY = 0;
+
+  let mainTouchCurrentX = 0;
+  let mainTouchCurrentY = 0;
+
+  let mainTouchMoved = false;
+
+
+  /* ---------------------------------------------------------
+     Main image touch start
+     --------------------------------------------------------- */
+
+  mainImageButton.addEventListener(
+    'touchstart',
+    (event) => {
+
+      if (
+        !event.touches.length
+      ) {
+        return;
+      }
+
+
+      const touch =
+        event.touches[0];
+
+
+      mainTouchStartX =
+        touch.clientX;
+
+      mainTouchStartY =
+        touch.clientY;
+
+
+      mainTouchCurrentX =
+        touch.clientX;
+
+      mainTouchCurrentY =
+        touch.clientY;
+
+
+      mainTouchMoved =
+        false;
+
+
+      mainImageWasSwiped =
+        false;
+
+    },
+    {
+      passive: true
+    }
+  );
+
+
+  /* ---------------------------------------------------------
+     Main image touch move
+     --------------------------------------------------------- */
+
+  mainImageButton.addEventListener(
+    'touchmove',
+    (event) => {
+
+      if (
+        !event.touches.length
+      ) {
+        return;
+      }
+
+
+      const touch =
+        event.touches[0];
+
+
+      mainTouchCurrentX =
+        touch.clientX;
+
+      mainTouchCurrentY =
+        touch.clientY;
+
+
+      const dx =
+        mainTouchCurrentX -
+        mainTouchStartX;
+
+
+      const dy =
+        mainTouchCurrentY -
+        mainTouchStartY;
+
+
+      if (
+        Math.abs(dx) > 10 ||
+        Math.abs(dy) > 10
+      ) {
+
+        mainTouchMoved =
+          true;
+
+      }
+
+
+      /*
+       * Prevent page scrolling only
+       * during horizontal swipe.
+       */
+
+      if (
+        Math.abs(dx) >
+        Math.abs(dy)
+      ) {
+
+        event.preventDefault();
+
+      }
+
+    },
+    {
+      passive: false
+    }
+  );
+
+
+  /* ---------------------------------------------------------
+     Main image touch end
+     --------------------------------------------------------- */
+
+  mainImageButton.addEventListener(
+    'touchend',
+    (event) => {
+
+      if (
+        !mainTouchMoved
+      ) {
+        return;
+      }
+
+
+      const dx =
+        mainTouchCurrentX -
+        mainTouchStartX;
+
+
+      const dy =
+        mainTouchCurrentY -
+        mainTouchStartY;
+
+
+      /*
+       * Ignore vertical gesture.
+       */
+
+      if (
+        Math.abs(dx) <=
+        Math.abs(dy)
+      ) {
+        return;
+      }
+
+
+      /*
+       * Ignore tiny movement.
+       */
+
+      if (
+        Math.abs(dx) < 40
+      ) {
+        return;
+      }
+
+
+      /*
+       * Mark as swipe so click
+       * won't open fullscreen.
+       */
+
+      mainImageWasSwiped =
+        true;
+
+
+      /*
+       * Swipe left = next
+       * Swipe right = previous
+       */
+
+      change(
+        dx < 0 ? 1 : -1
+      );
+
+
+      event.preventDefault();
+
+    },
+    {
+      passive: false
+    }
+  );
+
+
+  /* =========================================================
+     LIGHTBOX SWIPE
+     =========================================================
+
+     ← = next image
+     → = previous image
+     ========================================================= */
+
+  lightbox.addEventListener(
+    'touchstart',
+    (event) => {
+
+      if (
+        lightbox.hidden
+      ) {
+        return;
+      }
+
+
+      touchStart(event);
+
+    },
+    {
+      passive: true
+    }
+  );
+
+
+  lightbox.addEventListener(
+    'touchmove',
+    (event) => {
+
+      if (
+        lightbox.hidden
+      ) {
+        return;
+      }
+
+
+      touchMove(event);
+
+
+      const dx =
+        touchCurrentX -
+        touchStartX;
+
+
+      const dy =
+        touchCurrentY -
+        touchStartY;
+
+
+      /*
+       * Prevent page scrolling during
+       * horizontal fullscreen swipe.
+       */
+
+      if (
+        Math.abs(dx) >
+        Math.abs(dy)
+      ) {
+
+        event.preventDefault();
+
+      }
+
+    },
+    {
+      passive: false
+    }
+  );
+
+
+  lightbox.addEventListener(
+    'touchend',
+    () => {
+
+      if (
+        lightbox.hidden ||
+        !touchMoved
+      ) {
+        return;
+      }
+
+
+      const dx =
+        touchCurrentX -
+        touchStartX;
+
+
+      const dy =
+        touchCurrentY -
+        touchStartY;
+
+
+      /*
+       * Ignore vertical gesture.
+       */
+
+      if (
+        Math.abs(dx) <=
+        Math.abs(dy)
+      ) {
+        return;
+      }
+
+
+      /*
+       * Ignore tiny swipe.
+       */
+
+      if (
+        Math.abs(dx) < 40
+      ) {
+        return;
+      }
+
+
+      /*
+       * Swipe left = next
+       * Swipe right = previous
+       */
+
+      change(
+        dx < 0 ? 1 : -1
+      );
+
+    },
+    {
+      passive: true
     }
   );
 
@@ -904,6 +1408,7 @@ const render = () => {
 
 })();
 </script>
+
 
 </body>
 </html>
