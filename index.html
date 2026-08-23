@@ -223,7 +223,7 @@
 
   <footer>
     <span>Q3<span class="accent">ELITE</span></span>
-    <span>© 2026 Mus1n*</span>
+    <span>© 2026 ///Mus1n*</span>
   </footer>
 
   <div id="lightbox" class="lightbox" hidden aria-hidden="true">
@@ -271,32 +271,55 @@
     })
     .filter(Boolean);
 
+  /* =========================================================
+     STATE
+     ========================================================= */
+
   let index = 0;
 
   /*
-   * Number of thumbnails shown below the main image.
+   * Position of the thumbnail queue.
+   *
+   * IMPORTANT:
+   * This is separate from "index".
+   *
+   * index      = currently selected/main image
+   * queueStart = first thumbnail currently visible
+   */
+  let queueStart = 0;
+
+  /*
+   * Number of thumbnails visible below the main image.
    */
   const VISIBLE_THUMBS = 3;
 
   /*
-   * Prevent multiple wheel events from changing
-   * several screenshots at once.
+   * Prevent multiple wheel events from one gesture
+   * from scrolling too many thumbnails/images.
    */
   let wheelLocked = false;
 
-  /*
-   * ---------------------------------------------------------
-   * INITIAL SETUP
-   * ---------------------------------------------------------
-   */
 
-  sliderTotal.textContent = String(images.length).padStart(2, '0');
-  lightboxTotal.textContent = String(images.length).padStart(2, '0');
+  /* =========================================================
+     INITIAL SETUP
+     ========================================================= */
+
+  sliderTotal.textContent =
+    String(images.length).padStart(2, '0');
+
+  lightboxTotal.textContent =
+    String(images.length).padStart(2, '0');
 
   thumbs.forEach((thumb, i) => {
+
+    /*
+     * Ignore incorrect data-index values from HTML.
+     * JS generates the correct indexes automatically.
+     */
     thumb.dataset.index = i;
 
     thumb.setAttribute('role', 'tab');
+
     thumb.setAttribute(
       'aria-label',
       `Screenshot ${i + 1}`
@@ -310,61 +333,181 @@
   });
 
 
-  /*
-   * ---------------------------------------------------------
-   * THUMBNAIL QUEUE
-   * ---------------------------------------------------------
-   *
-   * Shows exactly 3 thumbnails whenever possible.
-   */
+  /* =========================================================
+     THUMBNAIL QUEUE
+     =========================================================
+     
+     Shows exactly 3 thumbnails whenever possible.
+
+     queueStart = 0
+
+     [01] [02] [03]
+     
+     queueStart = 1
+
+          [02] [03] [04]
+
+     queueStart = 2
+
+               [03] [04] [05]
+  */
 
   const updateThumbQueue = () => {
+
     const total = thumbs.length;
 
+    /*
+     * If there are 3 or fewer screenshots,
+     * show everything.
+     */
     if (total <= VISIBLE_THUMBS) {
+
       thumbs.forEach((thumb) => {
         thumb.style.display = '';
       });
 
+      queueStart = 0;
+
       return;
     }
 
-    let start = index;
-
     /*
-     * Do not allow the queue to go past the last
-     * possible group of 3 images.
+     * Keep queueStart inside valid range.
      */
-    if (start > total - VISIBLE_THUMBS) {
-      start = total - VISIBLE_THUMBS;
-    }
+    queueStart = Math.max(
+      0,
+      Math.min(
+        queueStart,
+        total - VISIBLE_THUMBS
+      )
+    );
 
     thumbs.forEach((thumb, i) => {
-      const visible =
-        i >= start &&
-        i < start + VISIBLE_THUMBS;
 
-      thumb.style.display = visible ? '' : 'none';
+      const visible =
+        i >= queueStart &&
+        i < queueStart + VISIBLE_THUMBS;
+
+      thumb.style.display =
+        visible ? '' : 'none';
     });
   };
 
 
+  /* =========================================================
+     SCROLL THUMBNAIL QUEUE
+     =========================================================
+     
+     This ONLY moves the thumbnail queue.
+
+     It does NOT change "index".
+     
+     ↓ = next group
+     ↑ = previous group
+  */
+
+  const scrollThumbQueue = (delta) => {
+
+    const total = thumbs.length;
+
+    if (total <= VISIBLE_THUMBS) {
+      return;
+    }
+
+    queueStart += delta;
+
+    queueStart = Math.max(
+      0,
+      Math.min(
+        queueStart,
+        total - VISIBLE_THUMBS
+      )
+    );
+
+    updateThumbQueue();
+  };
+
+
+  /* =========================================================
+     KEEP SELECTED THUMBNAIL VISIBLE
+     =========================================================
+     
+     Called when user clicks a thumbnail or changes image
+     using arrows/keyboard.
+  */
+
+  const ensureSelectedThumbVisible = () => {
+
+    const total = thumbs.length;
+
+    if (total <= VISIBLE_THUMBS) {
+      queueStart = 0;
+      return;
+    }
+
+    /*
+     * Selected image is before the visible queue.
+     */
+    if (index < queueStart) {
+
+      queueStart = index;
+
+      return;
+    }
+
+    /*
+     * Selected image is after the visible queue.
+     */
+    if (index >= queueStart + VISIBLE_THUMBS) {
+
+      queueStart =
+        index - VISIBLE_THUMBS + 1;
+    }
+
+    /*
+     * Safety clamp.
+     */
+    queueStart = Math.max(
+      0,
+      Math.min(
+        queueStart,
+        total - VISIBLE_THUMBS
+      )
+    );
+  };
+
+
+  /* =========================================================
+     RENDER
+     ========================================================= */
+
+const render = () => {
+  if (!images.length) return;
+
+  const image = images[index];
+
   /*
    * ---------------------------------------------------------
-   * RENDER
+   * MAIN IMAGE — SMOOTH FADE
    * ---------------------------------------------------------
    */
 
-  const render = () => {
-    if (!images.length) return;
+  sliderImage.classList.add('is-changing');
 
-    const image = images[index];
-
-    /*
-     * Main slider
-     */
+  setTimeout(() => {
     sliderImage.src = image.src;
     sliderImage.alt = image.alt;
+
+    /*
+     * Wait one frame before fading back in.
+     * This makes the transition noticeably smoother.
+     */
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        sliderImage.classList.remove('is-changing');
+      });
+    });
+  }, 100);
 
     sliderCurrent.textContent =
       String(index + 1).padStart(2, '0');
@@ -373,10 +516,12 @@
       String(images.length).padStart(2, '0');
 
 
-    /*
-     * Lightbox
-     */
+    /* -------------------------------------------------------
+       LIGHTBOX
+       ------------------------------------------------------- */
+
     lightboxImage.src = image.src;
+
     lightboxImage.alt = image.alt;
 
     lightboxCurrent.textContent =
@@ -386,13 +531,19 @@
       String(images.length).padStart(2, '0');
 
 
-    /*
-     * Thumbnails
-     */
-    thumbs.forEach((thumb, i) => {
-      const active = i === index;
+    /* -------------------------------------------------------
+       THUMBNAILS
+       ------------------------------------------------------- */
 
-      thumb.classList.toggle('active', active);
+    thumbs.forEach((thumb, i) => {
+
+      const active =
+        i === index;
+
+      thumb.classList.toggle(
+        'active',
+        active
+      );
 
       thumb.setAttribute(
         'aria-selected',
@@ -400,18 +551,27 @@
       );
     });
 
+
+    /*
+     * When main image changes through arrows,
+     * keyboard or lightbox, make sure its thumbnail
+     * remains visible.
+     */
+    ensureSelectedThumbVisible();
+
     updateThumbQueue();
   };
 
 
-  /*
-   * ---------------------------------------------------------
-   * CHANGE IMAGE
-   * ---------------------------------------------------------
-   */
+  /* =========================================================
+     CHANGE MAIN IMAGE
+     ========================================================= */
 
   const change = (delta) => {
-    if (!images.length) return;
+
+    if (!images.length) {
+      return;
+    }
 
     index =
       (index + delta + images.length) %
@@ -421,58 +581,72 @@
   };
 
 
-  /*
-   * ---------------------------------------------------------
-   * LIGHTBOX
-   * ---------------------------------------------------------
-   */
+  /* =========================================================
+     LIGHTBOX
+     ========================================================= */
 
   const openLightbox = () => {
+
     render();
 
     lightbox.hidden = false;
+
     lightbox.setAttribute(
       'aria-hidden',
       'false'
     );
 
-    document.body.classList.add('lightbox-open');
+    document.body.classList.add(
+      'lightbox-open'
+    );
   };
 
 
   const closeLightbox = () => {
+
     lightbox.hidden = true;
+
     lightbox.setAttribute(
       'aria-hidden',
       'true'
     );
 
-    document.body.classList.remove('lightbox-open');
+    document.body.classList.remove(
+      'lightbox-open'
+    );
   };
 
 
-  /*
-   * ---------------------------------------------------------
-   * BUTTONS
-   * ---------------------------------------------------------
-   */
+  /* =========================================================
+     MAIN IMAGE
+     ========================================================= */
 
   document
     .querySelector('.slider-image-button')
-    .addEventListener('click', openLightbox);
+    .addEventListener(
+      'click',
+      openLightbox
+    );
 
+
+  /* =========================================================
+     MAIN SLIDER ARROWS
+     ========================================================= */
 
   prevButton.addEventListener(
     'click',
     () => change(-1)
   );
 
-
   nextButton.addEventListener(
     'click',
     () => change(1)
   );
 
+
+  /* =========================================================
+     LIGHTBOX BUTTONS
+     ========================================================= */
 
   document
     .querySelector('.lightbox-close')
@@ -498,139 +672,233 @@
     );
 
 
-  /*
-   * ---------------------------------------------------------
-   * THUMBNAILS
-   * ---------------------------------------------------------
-   */
+  /* =========================================================
+     THUMBNAILS
+     =========================================================
+     
+     Clicking a thumbnail DOES change the main image.
+  */
 
   thumbs.forEach((thumb) => {
-    thumb.addEventListener('click', () => {
-      index = Number(thumb.dataset.index);
-      render();
-    });
+
+    thumb.addEventListener(
+      'click',
+      () => {
+
+        index =
+          Number(thumb.dataset.index);
+
+        /*
+         * Move queue so the clicked thumbnail
+         * remains visible.
+         */
+        ensureSelectedThumbVisible();
+
+        render();
+      }
+    );
   });
+
+
+  /* =========================================================
+     CLOSE LIGHTBOX BY CLICKING BACKGROUND
+     ========================================================= */
+
+  lightbox.addEventListener(
+    'click',
+    (event) => {
+
+      if (event.target === lightbox) {
+        closeLightbox();
+      }
+    }
+  );
+
+
+  /* =========================================================
+     KEYBOARD
+     ========================================================= */
+
+  document.addEventListener(
+    'keydown',
+    (event) => {
+
+      /*
+       * ESC closes fullscreen.
+       */
+      if (
+        event.key === 'Escape' &&
+        !lightbox.hidden
+      ) {
+        closeLightbox();
+        return;
+      }
+
+
+      /*
+       * Left / right changes main image.
+       */
+      if (event.key === 'ArrowLeft') {
+        change(-1);
+      }
+
+      if (event.key === 'ArrowRight') {
+        change(1);
+      }
+    }
+  );
+
+
+  /* =========================================================
+     MOUSE WHEEL
+     =========================================================
+     
+     IMPORTANT:
+
+     Thumbnail queue:
+       ↓ = scroll queue only
+       ↑ = scroll queue only
+
+     Lightbox:
+       ↓ = change fullscreen image
+       ↑ = change fullscreen image
+
+     Main image:
+       wheel does NOTHING.
+  */
 
 
   /*
-   * ---------------------------------------------------------
-   * CLOSE LIGHTBOX BY CLICKING BACKGROUND
-   * ---------------------------------------------------------
+   * Get the strongest wheel direction.
+   *
+   * This also works reasonably well with horizontal
+   * trackpad gestures.
    */
+  const getWheelDelta = (event) => {
 
-  lightbox.addEventListener('click', (event) => {
-    if (event.target === lightbox) {
-      closeLightbox();
-    }
-  });
-
-
-  /*
-   * ---------------------------------------------------------
-   * KEYBOARD
-   * ---------------------------------------------------------
-   */
-
-  document.addEventListener('keydown', (event) => {
-
-    if (
-      event.key === 'Escape' &&
-      !lightbox.hidden
-    ) {
-      closeLightbox();
-      return;
-    }
-
-    /*
-     * Keyboard navigation works globally,
-     * just like before.
-     */
-    if (event.key === 'ArrowLeft') {
-      change(-1);
-    }
-
-    if (event.key === 'ArrowRight') {
-      change(1);
-    }
-  });
-
-
-/* =========================================================
-   MOUSE WHEEL / THUMBNAIL QUEUE
-   ========================================================= */
-
-const handleWheel = (event) => {
-
-  /* Ignore tiny trackpad movements */
-  const delta =
-    Math.abs(event.deltaY) >= Math.abs(event.deltaX)
+    return Math.abs(event.deltaY) >=
+           Math.abs(event.deltaX)
       ? event.deltaY
       : event.deltaX;
-
-  if (Math.abs(delta) < 10) {
-    return;
-  }
-
-  /* Stop the page from scrolling */
-  event.preventDefault();
-
-  /* Prevent one wheel gesture from skipping many images */
-  if (wheelLocked) {
-    return;
-  }
-
-  wheelLocked = true;
-
-  change(delta > 0 ? 1 : -1);
-
-  setTimeout(() => {
-    wheelLocked = false;
-  }, 100);
-};
-
-
-/*
- * Scroll over the 3-thumbnail queue
- *
- * ↓ = next screenshot
- * ↑ = previous screenshot
- */
-thumbContainer.addEventListener(
-  'wheel',
-  handleWheel,
-  {
-    passive: false
-  }
-);
-
-
-/*
- * Scroll inside fullscreen lightbox
- *
- * ↓ = next screenshot
- * ↑ = previous screenshot
- */
-lightbox.addEventListener(
-  'wheel',
-  (event) => {
-
-    if (lightbox.hidden) {
-      return;
-    }
-
-    handleWheel(event);
-  },
-  {
-    passive: false
-  }
-);
+  };
 
 
   /*
    * ---------------------------------------------------------
-   * INITIAL RENDER
+   * THUMBNAIL QUEUE WHEEL
    * ---------------------------------------------------------
    */
+
+  thumbContainer.addEventListener(
+    'wheel',
+    (event) => {
+
+      const delta =
+        getWheelDelta(event);
+
+      /*
+       * Ignore tiny trackpad movements.
+       */
+      if (Math.abs(delta) < 10) {
+        return;
+      }
+
+      /*
+       * Prevent normal page scrolling while
+       * the pointer is over the thumbnail queue.
+       */
+      event.preventDefault();
+
+      /*
+       * Prevent one wheel gesture from jumping
+       * through several groups.
+       */
+      if (wheelLocked) {
+        return;
+      }
+
+      wheelLocked = true;
+
+
+      /*
+       * ONLY move thumbnail queue.
+       *
+       * The main "index" is NOT changed.
+       */
+      scrollThumbQueue(
+        delta > 0 ? 1 : -1
+      );
+
+
+      setTimeout(() => {
+        wheelLocked = false;
+      }, 100);
+    },
+    {
+      passive: false
+    }
+  );
+
+
+  /*
+   * ---------------------------------------------------------
+   * LIGHTBOX WHEEL
+   * ---------------------------------------------------------
+   *
+   * Here wheel DOES change the selected image.
+   */
+
+  lightbox.addEventListener(
+    'wheel',
+    (event) => {
+
+      if (lightbox.hidden) {
+        return;
+      }
+
+      const delta =
+        getWheelDelta(event);
+
+      if (Math.abs(delta) < 10) {
+        return;
+      }
+
+      /*
+       * Stop page scrolling.
+       */
+      event.preventDefault();
+
+      /*
+       * Prevent multiple changes from one gesture.
+       */
+      if (wheelLocked) {
+        return;
+      }
+
+      wheelLocked = true;
+
+
+      /*
+       * Change fullscreen image.
+       */
+      change(
+        delta > 0 ? 1 : -1
+      );
+
+
+      setTimeout(() => {
+        wheelLocked = false;
+      }, 100);
+    },
+    {
+      passive: false
+    }
+  );
+
+
+  /* =========================================================
+     INITIAL RENDER
+     ========================================================= */
 
   render();
 
