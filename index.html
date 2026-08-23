@@ -555,74 +555,75 @@
   });
 
 
-  /*
-   * ---------------------------------------------------------
-   * MOUSE WHEEL
-   * ---------------------------------------------------------
-   *
-   * IMPORTANT:
-   * This MUST be inside the same IIFE as `lightbox`
-   * and `change()`.
-   *
-   * Scroll down = next
-   * Scroll up   = previous
-   */
+/* =========================================================
+   MOUSE WHEEL / THUMBNAIL QUEUE
+   ========================================================= */
 
-  lightbox.addEventListener(
-    'wheel',
-    (event) => {
+const handleWheel = (event) => {
 
-      /*
-       * Ignore wheel while lightbox is closed.
-       */
-      if (lightbox.hidden) {
-        return;
-      }
+  /* Ignore tiny trackpad movements */
+  const delta =
+    Math.abs(event.deltaY) >= Math.abs(event.deltaX)
+      ? event.deltaY
+      : event.deltaX;
 
-      /*
-       * Prevent the page itself from scrolling.
-       */
-      event.preventDefault();
+  if (Math.abs(delta) < 10) {
+    return;
+  }
 
-      /*
-       * Prevent Firefox / trackpads from firing
-       * multiple changes from one scroll gesture.
-       */
-      if (wheelLocked) {
-        return;
-      }
+  /* Stop the page from scrolling */
+  event.preventDefault();
 
-      const delta =
-        Math.abs(event.deltaY) >= Math.abs(event.deltaX)
-          ? event.deltaY
-          : event.deltaX;
+  /* Prevent one wheel gesture from skipping many images */
+  if (wheelLocked) {
+    return;
+  }
 
-      /*
-       * Ignore tiny trackpad movements.
-       */
-      if (Math.abs(delta) < 10) {
-        return;
-      }
+  wheelLocked = true;
 
-      wheelLocked = true;
+  change(delta > 0 ? 1 : -1);
 
-      change(
-        delta > 0
-          ? 1
-          : -1
-      );
+  setTimeout(() => {
+    wheelLocked = false;
+  }, 100);
+};
 
-      /*
-       * Small cooldown.
-       */
-      setTimeout(() => {
-        wheelLocked = false;
-      }, 80);
-    },
-    {
-      passive: false
+
+/*
+ * Scroll over the 3-thumbnail queue
+ *
+ * ↓ = next screenshot
+ * ↑ = previous screenshot
+ */
+thumbContainer.addEventListener(
+  'wheel',
+  handleWheel,
+  {
+    passive: false
+  }
+);
+
+
+/*
+ * Scroll inside fullscreen lightbox
+ *
+ * ↓ = next screenshot
+ * ↑ = previous screenshot
+ */
+lightbox.addEventListener(
+  'wheel',
+  (event) => {
+
+    if (lightbox.hidden) {
+      return;
     }
-  );
+
+    handleWheel(event);
+  },
+  {
+    passive: false
+  }
+);
 
 
   /*
