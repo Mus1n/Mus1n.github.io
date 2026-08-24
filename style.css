@@ -4283,3 +4283,9 @@ footer {
     background-position: center, center, 50% center;
   }
 }
+
+
+.audience span strong {
+    display: inline !important;
+    white-space: nowrap;
+}
