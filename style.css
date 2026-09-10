@@ -4289,3 +4289,239 @@ footer {
     display: inline !important;
     white-space: nowrap;
 }
+
+
+/* =========================================================
+   VIDEO CAROUSEL + ARTICLE INTRO FIX
+   ========================================================= */
+
+.video-carousel {
+  position: relative;
+}
+
+.video-arrow {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  width: 42px;
+  height: 64px;
+  transform: translateY(-50%);
+  border: 1px solid rgba(210,235,248,.22);
+  border-radius: 10px;
+  background: rgba(6,12,18,.68);
+  color: #e9f7ff;
+  font: inherit;
+  font-size: 34px;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: .2s ease;
+}
+
+.video-arrow:hover {
+  background: rgba(60,158,219,.28);
+  border-color: rgba(105,212,255,.58);
+  color: #a9e9ff;
+}
+
+.video-prev { left: 14px; }
+.video-next { right: 14px; }
+
+.video-controls {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.video-dot {
+  width: 34px;
+  height: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(145,162,178,.28);
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.video-dot:hover,
+.video-dot.active {
+  background: var(--accent-2);
+}
+
+/* Keep the marker in its own fixed-width column at every width. */
+.article-intro {
+  grid-template-columns: max-content minmax(0, 1fr) !important;
+  column-gap: 14px !important;
+  row-gap: 0 !important;
+  align-items: start;
+}
+
+.article-mark {
+  display: block;
+  width: max-content;
+  min-width: max-content;
+  padding-top: .12em !important;
+  margin: 0 !important;
+  white-space: nowrap;
+  line-height: 1.75;
+}
+
+.article-intro p {
+  grid-column: 2;
+  min-width: 0;
+}
+
+.article-intro p:last-child {
+  grid-column: 2 !important;
+}
+
+@media (max-width: 800px) {
+  .article-intro {
+    grid-template-columns: max-content minmax(0, 1fr) !important;
+    gap: 0 10px !important;
+  }
+
+  .article-mark {
+    margin: 0 !important;
+  }
+
+  .video-arrow {
+    width: 36px;
+    height: 54px;
+    font-size: 30px;
+  }
+
+  .video-prev { left: 8px; }
+  .video-next { right: 8px; }
+}
+
+/* =========================================================
+   SMALL FIXES — VIDEO MOBILE CONTROLS + INTRO MARK ALIGNMENT
+   ========================================================= */
+
+/* Align the triple marker to the baseline of the first text line. */
+.article-intro {
+  align-items: baseline !important;
+}
+
+.article-mark {
+  align-self: baseline;
+  padding-top: 0 !important;
+  line-height: inherit !important;
+  transform: translateY(-0.02em);
+}
+
+/* Make carousel controls reliable on touch devices. */
+.video-arrow,
+.video-dot {
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@media (max-width: 800px) {
+  /* Keep the iframe completely separate from touch controls on mobile. */
+  .video-carousel {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) 42px;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .video-carousel .video {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .video-arrow {
+    position: static;
+    z-index: auto;
+    top: auto;
+    left: auto;
+    right: auto;
+    transform: none;
+    width: 42px;
+    height: 54px;
+    padding: 0;
+  }
+
+  .video-prev {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .video-next {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .video-controls {
+    margin-top: 10px;
+  }
+
+  .video-dot {
+    min-width: 38px;
+    height: 5px;
+  }
+
+  .article-intro {
+    align-items: baseline !important;
+  }
+
+  .article-mark {
+    padding-top: 0 !important;
+    margin: 0 !important;
+    line-height: inherit !important;
+    transform: translateY(-0.02em);
+  }
+}
+
+/* =========================================================
+   MOBILE VIDEO CAROUSEL — FULL-WIDTH VIDEO + CONTROLS BELOW
+   ========================================================= */
+@media (max-width: 800px) {
+  .video-carousel {
+    display: block;
+    position: relative;
+  }
+
+  .video-carousel .video {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .video-arrow {
+    position: absolute;
+    z-index: 4;
+    top: calc(100% + 8px);
+    width: 38px;
+    height: 28px;
+    transform: none;
+    padding: 0;
+    border-radius: 7px;
+    font-size: 24px;
+    line-height: 24px;
+  }
+
+  .video-prev {
+    left: 0;
+    right: auto;
+  }
+
+  .video-next {
+    left: auto;
+    right: 0;
+  }
+
+  .video-controls {
+    min-height: 28px;
+    margin-top: 8px;
+    align-items: center;
+  }
+}
