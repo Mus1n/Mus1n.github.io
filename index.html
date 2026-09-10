@@ -198,19 +198,30 @@
       <div class="video-wrap">
         <div class="video-heading">
           <span class="kicker">FEATURED VIDEO</span>
-          <span>Q3 ELITE — UPDATE TEASER</span>
+          <span id="videoTitle">Q3 ELITE — UPDATE TEASER</span>
         </div>
-<div class="video">
-  <iframe
-    src="https://www.youtube.com/embed/pRJ54B-83Ik?rel=0"
-    title="Quake 3 Elite — Update Teaser"
-    loading="lazy"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-    allowfullscreen>
-  </iframe>
-</div>
 
+        <div class="video-carousel" aria-label="Featured videos">
+          <button class="video-arrow video-prev" type="button" aria-label="Previous video">‹</button>
 
+          <div class="video">
+            <iframe
+              id="featuredVideo"
+              src="https://www.youtube.com/embed/pRJ54B-83Ik?rel=0"
+              title="Quake 3 Elite — Update Teaser"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen>
+            </iframe>
+          </div>
+
+          <button class="video-arrow video-next" type="button" aria-label="Next video">›</button>
+        </div>
+
+        <div class="video-controls" role="tablist" aria-label="Choose featured video">
+          <button class="video-dot active" type="button" role="tab" aria-selected="true" aria-label="Video 1" data-video-index="0"></button>
+          <button class="video-dot" type="button" role="tab" aria-selected="false" aria-label="Video 2" data-video-index="1"></button>
+        </div>
       </div>
     </section>
 
@@ -1481,6 +1492,59 @@
 })();
 </script>
 
+
+<script>
+(() => {
+  const frame = document.getElementById('featuredVideo');
+  const title = document.getElementById('videoTitle');
+  const prev = document.querySelector('.video-prev');
+  const next = document.querySelector('.video-next');
+  const dots = [...document.querySelectorAll('.video-dot')];
+
+  if (!frame || !title || !prev || !next || !dots.length) return;
+
+  const videos = [
+    {
+      src: 'https://www.youtube.com/embed/pRJ54B-83Ik?rel=0',
+      title: 'Q3 ELITE — UPDATE TEASER'
+    },
+    {
+      src: 'https://www.youtube.com/embed/wwqtZM127Qo?rel=0',
+      title: 'Q3 ELITE — FEATURED VIDEO'
+    }
+  ];
+
+  let videoIndex = 0;
+
+  const renderVideo = () => {
+    const video = videos[videoIndex];
+    frame.src = video.src;
+    frame.title = video.title;
+    title.textContent = video.title;
+
+    dots.forEach((dot, i) => {
+      const active = i === videoIndex;
+      dot.classList.toggle('active', active);
+      dot.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+  };
+
+  const changeVideo = (delta) => {
+    videoIndex = (videoIndex + delta + videos.length) % videos.length;
+    renderVideo();
+  };
+
+  prev.addEventListener('click', () => changeVideo(-1));
+  next.addEventListener('click', () => changeVideo(1));
+
+  dots.forEach((dot) => {
+    dot.addEventListener('click', () => {
+      videoIndex = Number(dot.dataset.videoIndex);
+      renderVideo();
+    });
+  });
+})();
+</script>
 
 </body>
 </html>
