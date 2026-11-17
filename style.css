@@ -4575,7 +4575,7 @@ footer {
   background:#05090e;cursor:pointer;
   box-shadow:0 34px 70px rgba(0,0,0,.62),0 0 0 5px rgba(255,255,255,.025);
   transform-style:preserve-3d;backface-visibility:hidden;
-  transition:transform .72s cubic-bezier(.22,.78,.18,1),opacity .55s,filter .55s,box-shadow .55s;
+  transition:transform .9s cubic-bezier(.18,.82,.2,1),opacity .9s cubic-bezier(.18,.82,.2,1),filter .9s cubic-bezier(.18,.82,.2,1),box-shadow .9s cubic-bezier(.18,.82,.2,1);
   will-change:transform;
 }
 .launcher-shot img {
@@ -4600,7 +4600,7 @@ footer {
   box-shadow:0 28px 65px rgba(0,0,0,.58),0 0 0 1px rgba(115,190,230,.14);
 }
 .launcher-stage.is-switching .launcher-shot {
-  transition:transform .72s cubic-bezier(.22,.78,.18,1),opacity .55s,filter .55s,box-shadow .55s;
+  transition:transform .9s cubic-bezier(.18,.82,.2,1),opacity .9s cubic-bezier(.18,.82,.2,1),filter .9s cubic-bezier(.18,.82,.2,1),box-shadow .9s cubic-bezier(.18,.82,.2,1);
 }
 .launcher-stage.is-switching[data-direction="next"] .launcher-shot.is-active {
   animation:launcher-card-to-back .72s cubic-bezier(.22,.78,.18,1) both;
@@ -4823,4 +4823,16 @@ footer {
     inset 0 0 0 1px rgba(121,207,255,.75),
     0 0 28px rgba(70,177,235,.38),
     0 0 55px rgba(70,177,235,.16) !important;
+}
+
+
+/* WAAPI exclusively controls carousel motion; disable conflicting CSS effects. */
+.launcher-stage .launcher-shot,
+.launcher-stage .launcher-shot.is-active,
+.launcher-stage .launcher-shot.is-back,
+.launcher-stage.is-switching .launcher-shot,
+.launcher-stage.is-switching .launcher-shot.is-active,
+.launcher-stage.is-switching .launcher-shot.is-back {
+  animation: none !important;
+  transition: none !important;
 }

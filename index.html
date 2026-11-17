@@ -1731,58 +1731,37 @@
       scheduleAutoplay();
       return;
     }
-
     const outgoing = cardFor(index);
     const incoming = cardFor(targetIndex);
     if (!outgoing || !incoming) return;
-
     transitioning = true;
     window.clearTimeout(autoplayTimer);
 
-    // Capture current transforms and suppress CSS transitions while applying the new
-    // state, so the Web Animations API receives distinct, deterministic endpoints.
-    const outgoingFrom = getComputedStyle(outgoing).transform;
-    const incomingFrom = getComputedStyle(incoming).transform;
-    const outgoingTransition = outgoing.style.transition;
-    const incomingTransition = incoming.style.transition;
-    outgoing.style.transition = 'none';
-    incoming.style.transition = 'none';
-
+    // Snapshot the actual rendered positions before changing card roles.
+    const before = new Map(shots.map(card => {
+      const s = getComputedStyle(card);
+      return [card, {transform:s.transform, opacity:s.opacity, filter:s.filter, boxShadow:s.boxShadow}];
+    }));
+    stage.classList.add('is-switching');
+    stage.dataset.direction = direction < 0 ? 'prev' : 'next';
+    shots.forEach(card => { card.style.pointerEvents='none'; card.style.animation='none'; });
     index = targetIndex;
     setCardStates();
-    stage.dataset.direction = direction < 0 ? 'prev' : 'next';
-    void stage.offsetWidth;
+    const after = new Map(shots.map(card => {
+      const s = getComputedStyle(card);
+      return [card, {transform:s.transform, opacity:s.opacity, filter:s.filter, boxShadow:s.boxShadow}];
+    }));
 
-    const outgoingTo = getComputedStyle(outgoing).transform;
-    const incomingTo = getComputedStyle(incoming).transform;
-
-    // Keep the incoming/rear card above the outgoing one while it glides forward.
-    incoming.style.zIndex = '5';
-    outgoing.style.zIndex = '4';
-    outgoing.style.pointerEvents = 'none';
-    incoming.style.pointerEvents = 'none';
-
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!reducedMotion && typeof incoming.animate === 'function') {
-      const incomingAnimation = incoming.animate([
-        { transform: incomingFrom, filter: 'brightness(.78) saturate(.84)' },
-        { transform: incomingTo, filter: 'brightness(1) saturate(1)' }
-      ], { duration: TRANSITION_MS, easing: 'cubic-bezier(.18,.82,.2,1)', fill: 'none' });
-
-      const outgoingAnimation = outgoing.animate([
-        { transform: outgoingFrom, filter: 'brightness(1)' },
-        { transform: outgoingTo, filter: 'brightness(.82) saturate(.86)' }
-      ], { duration: TRANSITION_MS, easing: 'cubic-bezier(.18,.82,.2,1)', fill: 'none' });
-
-      await Promise.allSettled([incomingAnimation.finished, outgoingAnimation.finished]);
-    }
-
-    outgoing.style.zIndex = '';
-    incoming.style.zIndex = '';
-    outgoing.style.pointerEvents = '';
-    incoming.style.pointerEvents = '';
-    outgoing.style.transition = outgoingTransition;
-    incoming.style.transition = incomingTransition;
+    // WAAPI explicitly animates from captured pixels to destination styles;
+    // this bypasses all legacy CSS transition/keyframe overrides.
+    const animations = shots.map(card => card.animate(
+      [before.get(card), after.get(card)],
+      {duration:TRANSITION_MS, easing:'cubic-bezier(0.18, 0.82, 0.2, 1)', fill:'both'}
+    ));
+    await Promise.allSettled(animations.map(a => a.finished));
+    animations.forEach(a => a.cancel());
+    shots.forEach(card => { card.style.pointerEvents=''; card.style.animation=''; });
+    stage.classList.remove('is-switching');
     transitioning = false;
     scheduleAutoplay();
   }
