@@ -84,7 +84,7 @@
     rel="stylesheet"
   >
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261117-launcher3d">
 </head>
 <body>
 
@@ -92,6 +92,7 @@
     <a class="brand" href="#top">Q3<span>ELITE</span></a>
     <nav>
       <a href="#screenshots">Screenshots</a>
+      <a href="#launcher">Launcher</a>
       <a href="#about">About</a>
       <a class="nav-button" href="https://t.me/s/Q3Elite/14" target="_blank" rel="noopener">Download</a>
     </nav>
@@ -225,10 +226,102 @@
       </div>
     </section>
 
+
+    <section id="launcher" class="section launcher-section">
+      <div class="section-heading launcher-heading">
+        <div>
+          <span class="kicker">03 / Q3ELITE LAUNCHER</span>
+          <h2>YOUR ARENA.<br><span>UNDER CONTROL.</span></h2>
+        </div>
+        <p>Install, update, configure and manage your Q3Elite setup from one place. No manual file hunting.</p>
+      </div>
+
+      <div class="launcher-showcase">
+        <div class="launcher-copy">
+          <span class="launcher-tag"><i></i> THE Q3ELITE CONTROL CENTER</span>
+          <h3>More than a launcher.<br><span>Your Quake 3 hub.</span></h3>
+          <p>Everything around the game is one click away — from installation and live servers to maps, demos, screenshots and personal configuration.</p>
+          <div class="launcher-points">
+            <div><b>01</b><span><strong>One-click setup</strong>Install Q3Elite components and optional addons without manual extraction.</span></div>
+            <div><b>02</b><span><strong>Always up to date</strong>Update the client, OSP2-BE and launcher independently.</span></div>
+            <div><b>03</b><span><strong>Your setup, your way</strong>Manage configs, addons and Dark / Light themes.</span></div>
+          </div>
+        </div>
+
+        <div class="launcher-carousel" aria-label="Launcher themes">
+          <div class="launcher-carousel-top">
+            <span class="kicker">INTERFACE PREVIEW</span>
+            <span class="launcher-count"><b id="launcherCurrent">02</b> / 02</span>
+          </div>
+          <div class="launcher-stage">
+            <button class="launcher-shot is-active" type="button" data-launcher-slide="1" aria-label="Show Light theme">
+              <img src="assets/launcher/launcher-light.png" alt="Q3Elite Launcher Light theme interface" loading="eager" decoding="async">
+              <span>LIGHT THEME</span>
+            </button>
+            <button class="launcher-shot is-back" type="button" data-launcher-slide="0" aria-label="Show Dark theme">
+              <img src="assets/launcher/launcher-dark.png" alt="Q3Elite Launcher Dark theme interface" loading="eager" decoding="async">
+              <span>DARK THEME</span>
+            </button>
+          </div>
+          <div class="launcher-carousel-controls">
+            <div class="launcher-progress"><span id="launcherProgress" style="width:100%"></span></div>
+            <div class="launcher-buttons">
+              <span id="launcherThemeName">PAPER / LIGHT</span>
+              <div>
+                <button type="button" id="launcherPrev" aria-label="Previous theme">←</button>
+                <button type="button" id="launcherNext" aria-label="Next theme">→</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="launcher-feature-grid">
+        <article class="launcher-feature">
+          <span class="feature-index">01 / INSTALLATION</span><h3>One-click installation</h3>
+          <p>Install the Q3Elite core and choose optional components such as External Maps and Music Playlist.</p>
+        </article>
+        <article class="launcher-feature">
+          <span class="feature-index">02 / SERVERS</span><h3>Live server browser</h3>
+          <p>Browse available arenas, inspect player activity and jump into a match directly from the launcher.</p>
+        </article>
+        <article class="launcher-feature">
+          <span class="feature-index">03 / MAPS</span><h3>Maps library</h3>
+          <p>Search local maps, explore the online catalog and launch maps without digging through PK3 files.</p>
+        </article>
+        <article class="launcher-feature">
+          <span class="feature-index">04 / PLAYER</span><h3>Stats &amp; matchmaking</h3>
+          <p>Access player statistics and matchmaking features from the same interface.</p>
+        </article>
+        <article class="launcher-feature">
+          <span class="feature-index">05 / PERSONALIZATION</span><h3>Configs &amp; cloud sync</h3>
+          <p>Edit and manage your configs, keep multiple config slots and synchronize supported settings with your account.</p>
+        </article>
+        <article class="launcher-feature">
+          <span class="feature-index">06 / MEDIA</span><h3>Demos &amp; screenshots</h3>
+          <p>Browse recorded demos and screenshots in dedicated sections, with convenient previews and playback.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="requirements" class="section requirements-section">
+      <div class="requirements-heading">
+        <div><span class="kicker">04 / SYSTEM REQUIREMENTS</span><h2>BUILT TO RUN.<br><span>READY TO FRAG.</span></h2></div>
+        <p>Recommended baseline for the Q3Elite experience.</p>
+      </div>
+      <div class="requirements-grid">
+        <div class="requirement"><span>PROCESSOR</span><strong>Intel Core i5-4440</strong><small>AMD A5-1600F</small></div>
+        <div class="requirement"><span>GRAPHICS</span><strong>NVIDIA GTX 1060</strong><small>For 2560×1440 / 250 FPS</small></div>
+        <div class="requirement"><span>MEMORY</span><strong>2 GB RAM</strong><small>System memory</small></div>
+        <div class="requirement"><span>STORAGE</span><strong>10 GB</strong><small>Available disk space</small></div>
+        <div class="requirement requirement-os"><span>OPERATING SYSTEM</span><strong>Windows 10+</strong><small>64-bit Windows</small></div>
+      </div>
+    </section>
+
     <section id="about" class="section article-section">
       <div class="section-heading">
         <div>
-          <span class="kicker">03 / ABOUT</span>
+          <span class="kicker">05 / ABOUT</span>
           <h2>ONE PACKAGE.<br><span>ZERO HUNTING.</span></h2>
         </div>
         <p>Everything you need to get modern Quake 3 running in one clean setup.</p>
@@ -1543,6 +1636,161 @@
       renderVideo();
     });
   });
+})();
+</script>
+
+
+<script>
+(() => {
+  const root = document.querySelector('.launcher-carousel');
+  if (!root) return;
+
+  const stage = root.querySelector('.launcher-stage');
+  const shots = [...root.querySelectorAll('.launcher-shot')];
+  const current = document.getElementById('launcherCurrent');
+  const name = document.getElementById('launcherThemeName');
+  const progress = document.getElementById('launcherProgress');
+  const prev = document.getElementById('launcherPrev');
+  const next = document.getElementById('launcherNext');
+  if (!stage || shots.length < 2 || !prev || !next) return;
+
+  let index = 1; // Paper / Light is always the initial theme.
+  let autoplayTimer = 0;
+  let transitioning = false;
+  const AUTOPLAY_DELAY = 4000;
+  const TRANSITION_MS = 900;
+
+  const cardFor = slide => shots.find(card => Number(card.dataset.launcherSlide) === slide);
+
+  function updateLabels() {
+    current.textContent = String(index + 1).padStart(2, '0');
+    name.textContent = index === 0 ? 'STEEL / DARK' : 'PAPER / LIGHT';
+    progress.style.width = index === 0 ? '50%' : '100%';
+  }
+
+  function setCardStates() {
+    shots.forEach(card => {
+      const active = Number(card.dataset.launcherSlide) === index;
+      card.classList.toggle('is-active', active);
+      card.classList.toggle('is-back', !active);
+      card.setAttribute('aria-hidden', active ? 'false' : 'true');
+      card.tabIndex = active ? -1 : 0;
+      card.style.zIndex = '';
+    });
+    updateLabels();
+  }
+
+  function scheduleAutoplay() {
+    window.clearTimeout(autoplayTimer);
+    autoplayTimer = window.setTimeout(() => {
+      transitionTo((index + 1) % shots.length, 1, false);
+    }, AUTOPLAY_DELAY);
+  }
+
+  async function transitionTo(targetIndex, direction = 1, resetTimer = true) {
+    if (transitioning || targetIndex === index) {
+      scheduleAutoplay();
+      return;
+    }
+
+    const outgoing = cardFor(index);
+    const incoming = cardFor(targetIndex);
+    if (!outgoing || !incoming) return;
+
+    transitioning = true;
+    window.clearTimeout(autoplayTimer);
+
+    // Capture current transforms and suppress CSS transitions while applying the new
+    // state, so the Web Animations API receives distinct, deterministic endpoints.
+    const outgoingFrom = getComputedStyle(outgoing).transform;
+    const incomingFrom = getComputedStyle(incoming).transform;
+    const outgoingTransition = outgoing.style.transition;
+    const incomingTransition = incoming.style.transition;
+    outgoing.style.transition = 'none';
+    incoming.style.transition = 'none';
+
+    index = targetIndex;
+    setCardStates();
+    stage.dataset.direction = direction < 0 ? 'prev' : 'next';
+    void stage.offsetWidth;
+
+    const outgoingTo = getComputedStyle(outgoing).transform;
+    const incomingTo = getComputedStyle(incoming).transform;
+
+    // Keep the incoming/rear card above the outgoing one while it glides forward.
+    incoming.style.zIndex = '5';
+    outgoing.style.zIndex = '4';
+    outgoing.style.pointerEvents = 'none';
+    incoming.style.pointerEvents = 'none';
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reducedMotion && typeof incoming.animate === 'function') {
+      const incomingAnimation = incoming.animate([
+        { transform: incomingFrom, filter: 'brightness(.78) saturate(.84)' },
+        { transform: incomingTo, filter: 'brightness(1) saturate(1)' }
+      ], { duration: TRANSITION_MS, easing: 'cubic-bezier(.18,.82,.2,1)', fill: 'none' });
+
+      const outgoingAnimation = outgoing.animate([
+        { transform: outgoingFrom, filter: 'brightness(1)' },
+        { transform: outgoingTo, filter: 'brightness(.82) saturate(.86)' }
+      ], { duration: TRANSITION_MS, easing: 'cubic-bezier(.18,.82,.2,1)', fill: 'none' });
+
+      await Promise.allSettled([incomingAnimation.finished, outgoingAnimation.finished]);
+    }
+
+    outgoing.style.zIndex = '';
+    incoming.style.zIndex = '';
+    outgoing.style.pointerEvents = '';
+    incoming.style.pointerEvents = '';
+    outgoing.style.transition = outgoingTransition;
+    incoming.style.transition = incomingTransition;
+    transitioning = false;
+    scheduleAutoplay();
+  }
+
+  function step(direction) {
+    const target = (index + direction + shots.length) % shots.length;
+    transitionTo(target, direction, true);
+  }
+
+  prev.addEventListener('click', event => {
+    event.preventDefault();
+    event.stopPropagation();
+    step(-1);
+  });
+  next.addEventListener('click', event => {
+    event.preventDefault();
+    event.stopPropagation();
+    step(1);
+  });
+
+  // The rear card is the only clickable screenshot. The front card never steals its hitbox.
+  shots.forEach(card => {
+    card.addEventListener('click', event => {
+      if (!card.classList.contains('is-back')) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const target = Number(card.dataset.launcherSlide);
+      transitionTo(target, target > index ? 1 : -1, true);
+    });
+    card.addEventListener('keydown', event => {
+      if ((event.key === 'Enter' || event.key === ' ') && card.classList.contains('is-back')) {
+        event.preventDefault();
+        const target = Number(card.dataset.launcherSlide);
+        transitionTo(target, target > index ? 1 : -1, true);
+      }
+    });
+  });
+
+  let startX = 0;
+  root.addEventListener('touchstart', event => { startX = event.changedTouches[0].clientX; }, {passive:true});
+  root.addEventListener('touchend', event => {
+    const dx = event.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 45) step(dx < 0 ? 1 : -1);
+  }, {passive:true});
+
+  setCardStates();
+  scheduleAutoplay();
 })();
 </script>
 
